@@ -425,19 +425,20 @@
         const OWNER_PASSWORD = 'admin123'; // Tukar password ni!
 
         // Get visitor data from storage
-        async function getVisitorData() {
+        function getVisitorData() {
             try {
-                const result = await window.storage.get(STORAGE_KEY, true);
-                return result ? JSON.parse(result.value) : [];
+                const data = localStorage.getItem(STORAGE_KEY);
+                return data ? JSON.parse(data) : [];
             } catch (error) {
+                console.error('Error getting data:', error);
                 return [];
             }
         }
 
         // Save visitor data to storage
-        async function saveVisitorData(data) {
+        function saveVisitorData(data) {
             try {
-                await window.storage.set(STORAGE_KEY, JSON.stringify(data), true);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
                 return true;
             } catch (error) {
                 console.error('Storage error:', error);
@@ -509,9 +510,9 @@
                 };
 
                 // Save to storage
-                const visitors = await getVisitorData();
+                const visitors = getVisitorData();
                 visitors.push(visitor);
-                await saveVisitorData(visitors);
+                saveVisitorData(visitors);
 
                 // Show success
                 showStatus(statusDiv, `✅ Terima kasih ${name}! Lokasi anda telah direkod.`, 'success');
@@ -524,7 +525,7 @@
         });
 
         // View visitors (Owner only)
-        async function viewVisitors() {
+        function viewVisitors() {
             const password = document.getElementById('ownerPassword').value;
             const statusDiv = document.getElementById('ownerStatus');
             const visitorsSection = document.getElementById('visitorsSection');
@@ -536,7 +537,7 @@
             }
 
             try {
-                const visitors = await getVisitorData();
+                const visitors = getVisitorData();
                 
                 if (visitors.length === 0) {
                     visitorsList.innerHTML = `
@@ -569,6 +570,7 @@
                 }, 300);
 
             } catch (error) {
+                console.error('Error viewing visitors:', error);
                 showStatus(statusDiv, '❌ Ralat mendapatkan data', 'error');
             }
         }
